@@ -1,23 +1,91 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Waze Particular - Arrays</title>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Waze Particular</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-    <div class="header">
-        <h1>Mapa da Cidade</h1>
-        <div id="controles">
-            <button id="btn-pontoa">Apontar início</button>
-            <button id="btn-gerar">Resetar Mapa</button>
-            <button id="btn-pontob">Apontar Destino</button>
-            <button id="btn-rota">Traçar Rota (A -> B)</button>
-        </div>
-    </div>
 
-    <div id="tabuleiro"></div>
+  <header>
+    <h1>Waze Particular</h1>
+    <span class="header-badge">Algoritmos e Estrutura de Dados — IFPE</span>
+  </header>
+
+  <div class="layout">
+
+    <aside>
+
+      <div class="aside-section">
+        <div class="aside-label">Definir Pontos</div>
+        <button class="btn active" id="btn-pontoa">
+          <span class="dot dot-verde"></span>
+          Apontar Início
+        </button>
+        <button class="btn" id="btn-pontob">
+          <span class="dot dot-vermelho"></span>
+          Apontar Destino
+        </button>
+      </div>
+
+      <div class="aside-section">
+        <div class="aside-label">Navegação</div>
+        <button class="btn btn-primary" id="btn-rota">
+          Traçar Rota (A → B)
+        </button>
+        <button class="btn" id="btn-gerar">
+          <span class="dot dot-cinza"></span>
+          Resetar Mapa
+        </button>
+      </div>
+
+      <div class="aside-section">
+        <div class="aside-label">Cidades</div>
+        <button class="btn" id="btn-salvar">
+          <span class="dot dot-azul"></span>
+          Salvar Cidade
+        </button>
+        <button class="btn" id="btn-carregar">
+          <span class="dot dot-cinza"></span>
+          Carregar Cidade
+        </button>
+      </div>
+
+      <div class="aside-section legenda-section">
+        <div class="aside-label">Legenda</div>
+        <div class="leg"><div class="leg-cor" id="leg-rua"></div>Rua</div>
+        <div class="leg"><div class="leg-cor" id="leg-predio"></div>Prédio</div>
+        <div class="leg"><div class="leg-cor" id="leg-casa"></div>Casa</div>
+        <div class="leg"><div class="leg-cor" id="leg-praca"></div>Praça</div>
+        <div class="leg"><div class="leg-cor" id="leg-engarraf"></div>Engarrafamento</div>
+        <div class="leg"><div class="leg-cor" id="leg-caminho"></div>Caminho</div>
+        <div class="leg"><div class="leg-cor" id="leg-ponto-a"></div>Ponto A</div>
+        <div class="leg"><div class="leg-cor" id="leg-ponto-b"></div>Ponto B</div>
+      </div>
+
+    </aside>
+
+    <main>
+      <div id="tabuleiro"></div>
+    </main>
+
+  </div>
+
+  <div class="statusbar">
+    <div class="si"><span class="si-dot"></span>Sistema ativo</div>
+    <div class="si">Grade: 20×20</div>
+    <div class="si" id="status-msg">Selecione o ponto de início</div>
+  </div>
+
+    <div id="modal-mensagem" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+    <p id="modal-texto">Mensagem</p>
+    <button class="btn btn-primary" id="modal-ok">OK</button>
+    </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

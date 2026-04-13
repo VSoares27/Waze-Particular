@@ -1,71 +1,442 @@
-/* style.css - Tema Preto e Branco (Monocromático) */
+/* tema mapa antigo / papel */
+
+:root {
+  --bg:           #e8ddcc;
+  --surface:      #d6c8b4;
+  --surface2:     #c4b59b;
+  --border:       #a28b6f;
+  --border2:      #8b7356;
+  --text:         #2e241b;
+  --muted:        #5c4e3d;
+  --accent:       #6b4f32;
+  --green:        #4a6b3c;
+  --red:          #b34e3a;
+
+  /* cores das células */
+  --c-rua:        #dccdb6;
+  --c-predio:     #b0997a;
+  --c-casa:       #c9a87c;
+  --c-praca:      #8ba86b;
+  --c-engarraf:   #c26a3e;
+  --c-caminho:    #5a7a9e;
+  --c-ponto-a:    #3d6b4c;
+  --c-ponto-b:    #b34e3a;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 body {
-    font-family: monospace; /* Fonte monoespaçada dá um tom mais técnico */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #ffffff;
-    color: #000000;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-/* O fundo do tabuleiro vira preto para criar as linhas da grade (gap) */
-#tabuleiro {
-    display: grid;
-    gap: 1px; 
-    background-color: #000000; 
-    border: 2px solid #000000;
-    margin-top: 20px;
+/* HEADER */
+
+header {
+  height: 52px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  flex-shrink: 0;
 }
+
+header h1 {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+}
+
+header h1::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 18px;
+  background: var(--accent);
+}
+
+.header-badge {
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* LAYOUT */
+
+.layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* SIDEBAR */
+
+aside {
+  width: 210px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+
+.aside-section {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.legenda-section {
+  flex: 1;
+}
+
+.aside-label {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+/* BOTÕES */
+
+.btn {
+  width: 100%;
+  padding: 9px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s;
+  margin-bottom: 5px;
+}
+
+.btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(107, 79, 50, 0.1);
+}
+
+.btn.active {
+  border-color: var(--accent);
+  background: rgba(107, 79, 50, 0.2);
+  color: var(--accent);
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #f0e6d8;
+  justify-content: center;
+  padding: 11px;
+  margin-top: 2px;
+}
+
+.btn-primary:hover {
+  background: #5a4230;
+  border-color: #5a4230;
+  color: #f0e6d8;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot-verde    { background: var(--green); }
+.dot-vermelho { background: var(--red); }
+.dot-azul     { background: var(--accent); }
+.dot-cinza    { background: var(--muted); }
+
+/* LEGENDA */
+
+.leg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 9px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.leg-cor {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+#leg-rua      { background: var(--c-rua); }
+#leg-predio   { background: var(--c-predio); }
+#leg-casa     { background: var(--c-casa); }
+#leg-praca    { background: var(--c-praca); }
+#leg-engarraf { background: var(--c-engarraf); }
+#leg-caminho  { background: var(--c-caminho); }
+#leg-ponto-a  { background: var(--c-ponto-a); }
+#leg-ponto-b  { background: var(--c-ponto-b); }
+
+/* MAIN - ÁREA DO TABULEIRO */
+
+main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+
+main::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 36px 36px;
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+#tabuleiro {
+  display: grid;
+  gap: 1px;
+  background: var(--border2);
+  border: 2px solid var(--border2);
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* CÉLULAS DO TABULEIRO */
 
 .celula {
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  transition: filter 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  position: relative;
+  user-select: none;
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-/* --- TIPOS DE TERRENO --- */
-
-/* Rua: Totalmente branca */
-.rua { 
-    background-color: #ffffff; 
+.celula:hover {
+  filter: brightness(1.1);
+  border: 1px solid rgba(0, 0, 0, 0.3);
 }
 
-/* Prédio: Totalmente preto */
-.predio { 
-    background-color: #000000; 
+.rua            { background: var(--c-rua); }
+.predio         { background: var(--c-predio); }
+.casa           { background: var(--c-casa); }
+.praca          { background: var(--c-praca); }
+.engarrafamento { background: var(--c-engarraf); }
+
+.caminho {
+  background: var(--c-caminho);
 }
 
 .ponto-a {
-    background-color: green;
+  background: var(--c-ponto-a);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5);
 }
 
 .ponto-b {
-    background-color: red;
-    z-index: first;
+  background: var(--c-ponto-b);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5);
 }
 
-/* Engarrafamento: Como não temos vermelho, usamos listras pretas e brancas de aviso */
-.engarrafamento { 
-    background-color: #ffffff;
-    background-image: repeating-linear-gradient(
-        45deg,
-        #000000,
-        #000000 5px,
-        #ffffff 5px,
-        #ffffff 10px
-    );
+/* símbolos dentro das células */
+.predio::after {
+  content: '█';
+  color: rgba(0, 0, 0, 0.3);
+  font-size: 15px;
 }
 
-/* --- CAMINHO DO ALGORITMO --- */
-
-/* Caminho: Um tom de cinza escuro para marcar a rota do carro */
-.caminho { 
-    background-color: yellow; 
+.casa::after {
+  content: '⌂';
+  color: rgba(80, 50, 30, 0.5);
+  font-size: 16px;
 }
 
-/* Opcional: Adicionar um efeito de "hover" para saber onde o mouse está */
-.celula:hover {
-    opacity: 0.7;
+.praca::after {
+  content: '▲';
+  color: rgba(40, 70, 30, 0.5);
+  font-size: 12px;
+}
+
+.engarrafamento::after {
+  content: '✘';
+  color: rgba(120, 40, 10, 0.7);
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.ponto-a::after {
+  content: 'A';
+  color: #fff;
+  font-size: 11px;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+
+.ponto-b::after {
+  content: 'B';
+  color: #fff;
+  font-size: 11px;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+
+.caminho::after {
+  content: '·';
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 18px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* STATUS BAR */
+
+.statusbar {
+  height: 30px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 24px;
+  flex-shrink: 0;
+}
+
+.si {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+#status-msg {
+  color: var(--text);
+}
+
+.si-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+/* MODAL DE MENSAGEM */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(30, 20, 10, 0.7);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-box {
+  background: var(--surface);
+  border: 2px solid var(--border2);
+  padding: 28px 32px;
+  max-width: 360px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  animation: fadeIn 0.15s ease;
+}
+
+.modal-box p {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+  margin-bottom: 24px;
+  word-break: break-word;
+}
+
+.modal-box .btn {
+  width: auto;
+  min-width: 100px;
+  margin: 0 auto;
+  display: inline-block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* TOOLTIP */
+#tooltip-personalizado {
+    position: fixed;
+    background: var(--surface);
+    color: var(--text);
+    padding: 8px 12px;
+    border: 1px solid var(--border2);
+    border-radius: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    display: none;
+    pointer-events: none;
+    backdrop-filter: blur(4px);
 }
