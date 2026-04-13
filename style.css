@@ -1,0 +1,71 @@
+/* style.css - Tema Preto e Branco (Monocromático) */
+
+body {
+    font-family: monospace; /* Fonte monoespaçada dá um tom mais técnico */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #ffffff;
+    color: #000000;
+}
+
+/* O fundo do tabuleiro vira preto para criar as linhas da grade (gap) */
+#tabuleiro {
+    display: grid;
+    gap: 1px; 
+    background-color: #000000; 
+    border: 2px solid #000000;
+    margin-top: 20px;
+}
+
+.celula {
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+/* --- TIPOS DE TERRENO --- */
+
+/* Rua: Totalmente branca */
+.rua { 
+    background-color: #ffffff; 
+}
+
+/* Prédio: Totalmente preto */
+.predio { 
+    background-color: #000000; 
+}
+
+.ponto-a {
+    background-color: green;
+}
+
+.ponto-b {
+    background-color: red;
+    z-index: first;
+}
+
+/* Engarrafamento: Como não temos vermelho, usamos listras pretas e brancas de aviso */
+.engarrafamento { 
+    background-color: #ffffff;
+    background-image: repeating-linear-gradient(
+        45deg,
+        #000000,
+        #000000 5px,
+        #ffffff 5px,
+        #ffffff 10px
+    );
+}
+
+/* --- CAMINHO DO ALGORITMO --- */
+
+/* Caminho: Um tom de cinza escuro para marcar a rota do carro */
+.caminho { 
+    background-color: yellow; 
+}
+
+/* Opcional: Adicionar um efeito de "hover" para saber onde o mouse está */
+.celula:hover {
+    opacity: 0.7;
+}
