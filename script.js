@@ -1,14 +1,13 @@
-// classes do terreno
 class Terreno {
     constructor(x, y) {
         this.x = x;
         this.y = y;
         this.isCaminho = false;
     }
-    obterCusto() { return 1; }
-    ehPassavel() { return true; }
+    obterCusto()     { return 1; }
+    ehPassavel()     { return true; }
     obterClasseCSS() { return ''; }
-    obterNome() { return 'terreno'; }
+    obterNome()      { return 'terreno'; }
 }
 
 class Rua extends Terreno {
@@ -16,14 +15,11 @@ class Rua extends Terreno {
         super(x, y);
         this.temTransito = false;
     }
-    ehPassavel() { return !this.temTransito; }
-    obterCusto()  { return 1; }
-    obterClasseCSS() {
-        return this.temTransito ? 'engarrafamento' : 'rua';
-    }
-    obterNome() {
-        return this.temTransito ? 'engarrafamento' : 'rua';
-    }
+    // rua com trânsito bloqueia passagem temporariamente
+    ehPassavel()     { return !this.temTransito; }
+    obterCusto()     { return 1; }
+    obterClasseCSS() { return this.temTransito ? 'engarrafamento' : 'rua'; }
+    obterNome()      { return this.temTransito ? 'engarrafamento' : 'rua'; }
 }
 
 class Predio extends Terreno {
@@ -47,16 +43,27 @@ class Praca extends Terreno {
     obterNome()      { return 'praça'; }
 }
 
-// variáveis globais
+// ============================================================
+// VARIÁVEIS GLOBAIS
+// mapa é o array 2D protagonista — toda lógica passa por ele
+// ============================================================
+
 const LINHAS  = 20;
 const COLUNAS = 20;
 
-let pontoA         = null;
-let pontoB         = null;
-let mapa           = [];
+let pontoA          = null;
+let pontoB          = null;
+let mapa            = [];
 let ferramentaAtual = 'pontoa';
 
-// modal de mensagem personalizado
+let rotaAnimacao   = [];
+let indiceAnimacao = 0;
+let intervaloAnim  = null;
+
+// ============================================================
+// MODAL DE MENSAGEM (substitui alert nativo)
+// ============================================================
+
 const modalOverlay = document.getElementById('modal-mensagem');
 const modalTexto   = document.getElementById('modal-texto');
 const modalOkBtn   = document.getElementById('modal-ok');
@@ -69,9 +76,7 @@ function mostrarMensagem(mensagem) {
 }
 
 function fecharModal() {
-    if (modalOverlay) {
-        modalOverlay.style.display = 'none';
-    }
+    if (modalOverlay) modalOverlay.style.display = 'none';
 }
 
 if (modalOkBtn) {
@@ -80,9 +85,7 @@ if (modalOkBtn) {
 
 if (modalOverlay) {
     modalOverlay.addEventListener('click', (e) => {
-        if (e.target === modalOverlay) {
-            fecharModal();
-        }
+        if (e.target === modalOverlay) fecharModal();
     });
 }
 
@@ -92,23 +95,32 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// tooltip personalizado
+// ============================================================
+// TOOLTIP PERSONALIZADO
+// criado manualmente via DOM, sem biblioteca externa
+// posição segue o mouse com e.clientX e e.clientY
+// ============================================================
+
 const tooltip = document.createElement('div');
 tooltip.id = 'tooltip-personalizado';
 document.body.appendChild(tooltip);
 
 function mostrarTooltip(texto, x, y) {
-    tooltip.textContent = texto;
+    tooltip.textContent   = texto;
     tooltip.style.display = 'block';
-    tooltip.style.left = (x + 15) + 'px';
-    tooltip.style.top = (y + 15) + 'px';
+    tooltip.style.left    = (x + 15) + 'px';
+    tooltip.style.top     = (y + 15) + 'px';
 }
 
 function esconderTooltip() {
     tooltip.style.display = 'none';
 }
 
-// inicialização do mapa
+// ============================================================
+// INICIALIZAÇÃO DO MAPA
+// criação manual da matriz 2D com laços for e índices
+// ============================================================
+
 function inicializarMapa() {
     mapa = [];
 
@@ -116,6 +128,7 @@ function inicializarMapa() {
         mapa[i] = [];
 
         for (let j = 0; j < COLUNAS; j++) {
+            // pontos A e B sempre são ruas para garantir passagem
             if ((pontoA !== null && j === pontoA.x && i === pontoA.y) ||
                 (pontoB !== null && j === pontoB.x && i === pontoB.y)) {
                 mapa[i][j] = new Rua(j, i);
@@ -123,7 +136,8 @@ function inicializarMapa() {
             }
 
             let sorteio = Math.random();
-            
+
+            // distribuição: 20% Prédio, 10% Casa, 5% Praça, 65% Rua
             if (sorteio < 0.20) {
                 mapa[i][j] = new Predio(j, i);
             } else if (sorteio < 0.30) {
@@ -132,16 +146,18 @@ function inicializarMapa() {
                 mapa[i][j] = new Praca(j, i);
             } else {
                 let novaRua = new Rua(j, i);
-                if (Math.random() < 0.15) {
-                    novaRua.temTransito = true;
-                }
+                if (Math.random() < 0.15) novaRua.temTransito = true;
                 mapa[i][j] = novaRua;
             }
         }
     }
 }
 
-// renderização do tabuleiro
+// ============================================================
+// RENDERIZAÇÃO DO TABULEIRO
+// o array controla a si mesmo — array é protagonista
+// ============================================================
+
 function desenharTela() {
     const tabuleiro = document.getElementById('tabuleiro');
     tabuleiro.innerHTML = '';
@@ -149,16 +165,18 @@ function desenharTela() {
     tabuleiro.style.gridTemplateColumns = `repeat(${COLUNAS}, 34px)`;
     tabuleiro.style.gridTemplateRows    = `repeat(${LINHAS}, 34px)`;
 
-    for (let i = 0; i < LINHAS; i++) {
-        for (let j = 0; j < COLUNAS; j++) {
+    for (let i = 0; i < mapa.length; i++) {
+
+        for (let j = 0; j < mapa[i].length; j++) {
+
             const celula = mapa[i][j];
 
             const div = document.createElement('div');
             div.classList.add('celula');
             div.classList.add(celula.obterClasseCSS());
 
-            let isPontoA = (pontoA !== null && i === pontoA.y && j === pontoA.x);
-            let isPontoB = (pontoB !== null && i === pontoB.y && j === pontoB.x);
+            let isPontoA    = (pontoA !== null && i === pontoA.y && j === pontoA.x);
+            let isPontoB    = (pontoB !== null && i === pontoB.y && j === pontoB.x);
             let nomeTooltip = celula.obterNome();
 
             if (isPontoA) {
@@ -172,18 +190,13 @@ function desenharTela() {
                 nomeTooltip = 'caminho traçado';
             }
 
-            div.addEventListener('mouseenter', (e) => {
-                mostrarTooltip(nomeTooltip, e.clientX, e.clientY);
-            });
-            
-            div.addEventListener('mousemove', (e) => {
+            // tooltip segue o mouse com e.clientX e e.clientY
+            div.addEventListener('mouseenter', (e) => mostrarTooltip(nomeTooltip, e.clientX, e.clientY));
+            div.addEventListener('mousemove',  (e) => {
                 tooltip.style.left = (e.clientX + 15) + 'px';
-                tooltip.style.top = (e.clientY + 15) + 'px';
+                tooltip.style.top  = (e.clientY + 15) + 'px';
             });
-            
-            div.addEventListener('mouseleave', () => {
-                esconderTooltip();
-            });
+            div.addEventListener('mouseleave', () => esconderTooltip());
 
             div.addEventListener('click', () => {
                 const celulaClicada = mapa[i][j];
@@ -223,7 +236,10 @@ function desenharTela() {
     }
 }
 
-// algoritmo a* para traçar rota
+// ============================================================
+// ALGORITMO A* — TRAÇAR ROTA
+// ============================================================
+
 function calcularHeuristica(noAtual, noDestino) {
     return Math.abs(noAtual.x - noDestino.x) + Math.abs(noAtual.y - noDestino.y);
 }
@@ -231,11 +247,12 @@ function calcularHeuristica(noAtual, noDestino) {
 function obterVizinhos(celula) {
     let vizinhos = [];
     const { x, y } = celula;
-    
-    if (y > 0)           vizinhos[vizinhos.length] = mapa[y - 1][x];
-    if (y < LINHAS - 1)  vizinhos[vizinhos.length] = mapa[y + 1][x];
-    if (x > 0)           vizinhos[vizinhos.length] = mapa[y][x - 1];
-    if (x < COLUNAS - 1) vizinhos[vizinhos.length] = mapa[y][x + 1];
+
+    if (y > 0)                   vizinhos[vizinhos.length] = mapa[y - 1][x];
+    if (y < mapa.length - 1)     vizinhos[vizinhos.length] = mapa[y + 1][x];
+    if (x > 0)                   vizinhos[vizinhos.length] = mapa[y][x - 1];
+    if (x < mapa[y].length - 1)  vizinhos[vizinhos.length] = mapa[y][x + 1];
+
     return vizinhos;
 }
 
@@ -245,8 +262,15 @@ function tracarRota() {
         return;
     }
 
-    for (let i = 0; i < LINHAS; i++) {
-        for (let j = 0; j < COLUNAS; j++) {
+    // para animação anterior se existir
+    if (intervaloAnim !== null) {
+        clearInterval(intervaloAnim);
+        intervaloAnim = null;
+    }
+
+    // limpa caminho anterior com mapa.length e mapa[i].length
+    for (let i = 0; i < mapa.length; i++) {
+        for (let j = 0; j < mapa[i].length; j++) {
             mapa[i][j].isCaminho = false;
         }
     }
@@ -266,6 +290,7 @@ function tracarRota() {
     let fValores = [];
     let fTam     = 0;
 
+    // busca manual em array paralelo (substitui Map.get)
     function buscarValor(chave, chaves, valores, tam) {
         for (let i = 0; i < tam; i++) {
             if (chaves[i] === chave) return valores[i];
@@ -273,6 +298,7 @@ function tracarRota() {
         return Infinity;
     }
 
+    // inserção/atualização manual (substitui Map.set)
     function definirValor(chave, valor, chaves, valores, tamAtual) {
         for (let i = 0; i < tamAtual; i++) {
             if (chaves[i] === chave) {
@@ -285,6 +311,7 @@ function tracarRota() {
         return tamAtual + 1;
     }
 
+    // verificação de existência manual (substitui Map.has)
     function existeChave(chave, chaves, tam) {
         for (let i = 0; i < tam; i++) {
             if (chaves[i] === chave) return true;
@@ -292,11 +319,12 @@ function tracarRota() {
         return false;
     }
 
-    let openSet    = [];
-    let openSetTam = 0;
 
-    openSet[0] = celulaInicial;
-    openSetTam = 1;
+    let fila   = [];
+    let inicio = 0;
+
+    // inserção manual: fila[fila.length] = posicao
+    fila[fila.length] = celulaInicial;
 
     gChaves[0]  = celulaInicial;
     gValores[0] = 0;
@@ -307,43 +335,62 @@ function tracarRota() {
     fTam        = 1;
 
     let limiteIteracoes = 0;
-    const MAX_ITERACOES = LINHAS * COLUNAS * 4;
+    const MAX_ITERACOES = mapa.length * mapa[0].length * 4;
 
-    while (openSetTam > 0) {
+    // consumo da fila: fila[inicio], inicio++
+    while (inicio < fila.length) {
         limiteIteracoes++;
         if (limiteIteracoes > MAX_ITERACOES) {
             console.error("limite de iterações atingido");
             break;
         }
 
-        let atual    = openSet[0];
-        let idxAtual = 0;
-        for (let i = 1; i < openSetTam; i++) {
-            let fAtual = buscarValor(atual,      fChaves, fValores, fTam);
-            let fNo    = buscarValor(openSet[i], fChaves, fValores, fTam);
+        let atual    = fila[inicio];
+        let idxAtual = inicio;
+
+        for (let i = inicio + 1; i < fila.length; i++) {
+            if (fila[i] === null) continue;
+            let fAtual = buscarValor(atual,   fChaves, fValores, fTam);
+            let fNo    = buscarValor(fila[i], fChaves, fValores, fTam);
             if (fNo < fAtual) {
-                atual    = openSet[i];
+                atual    = fila[i];
                 idxAtual = i;
             }
         }
 
+        fila[idxAtual] = null;
+
+        // chegou no destino — monta o array de rota para o carro
         if (atual === celulaFinal) {
+
+            rotaAnimacao   = [];
+            indiceAnimacao = 0;
+
             let no = atual;
             while (existeChave(no, cameFromChaves, tamanhoCameFrom)) {
-                no.isCaminho = true;
+                // inserção manual no array de rota
+                rotaAnimacao[rotaAnimacao.length] = no;
                 no = buscarValor(no, cameFromChaves, cameFromValores, tamanhoCameFrom);
             }
-            celulaInicial.isCaminho = true;
+            rotaAnimacao[rotaAnimacao.length] = celulaInicial;
+
+            let esq = 0;
+            let dir = rotaAnimacao.length - 1;
+            while (esq < dir) {
+                let temp           = rotaAnimacao[esq];
+                rotaAnimacao[esq]  = rotaAnimacao[dir];
+                rotaAnimacao[dir]  = temp;
+                esq++;
+                dir--;
+            }
+
             desenharTela();
-            atualizarStatus('rota calculada com sucesso');
+            animarCarro();
+            atualizarStatus('rota calculada — carro em movimento');
             return;
         }
 
-        for (let i = idxAtual; i < openSetTam - 1; i++) {
-            openSet[i] = openSet[i + 1];
-        }
-        openSet[openSetTam - 1] = null;
-        openSetTam--;
+        if (idxAtual === inicio) inicio++;
 
         let vizinhos = obterVizinhos(atual);
 
@@ -361,16 +408,15 @@ function tracarRota() {
                 fTam = definirValor(vizinho, tentativaG + calcularHeuristica(vizinho, celulaFinal), fChaves, fValores, fTam);
 
                 let jaEsta = false;
-                for (let i = 0; i < openSetTam; i++) {
-                    if (openSet[i] === vizinho) {
+                for (let i = 0; i < fila.length; i++) {
+                    if (fila[i] === vizinho) {
                         jaEsta = true;
                         break;
                     }
                 }
 
                 if (!jaEsta) {
-                    openSet[openSetTam] = vizinho;
-                    openSetTam++;
+                    fila[fila.length] = vizinho;
                 }
             }
         }
@@ -381,10 +427,49 @@ function tracarRota() {
     desenharTela();
 }
 
-// funções utilitárias
+function animarCarro() {
+    if (intervaloAnim !== null) {
+        clearInterval(intervaloAnim);
+        intervaloAnim = null;
+    }
+
+    indiceAnimacao = 0;
+
+    intervaloAnim = setInterval(() => {
+
+        // rotaAnimacao[indice] — acessa posição atual
+        if (indiceAnimacao < rotaAnimacao.length) {
+
+            let posicaoAtual = rotaAnimacao[indiceAnimacao]; 
+            posicaoAtual.isCaminho = true;
+            desenharTela();
+
+
+            const tabuleiro = document.getElementById('tabuleiro');
+            const idx       = posicaoAtual.y * mapa[0].length + posicaoAtual.x;
+            const celDiv    = tabuleiro.children[idx];
+            if (celDiv) celDiv.classList.add('carro-atual');
+
+            indiceAnimacao++; 
+
+        } else {
+
+            clearInterval(intervaloAnim);
+            intervaloAnim = null;
+            atualizarStatus('destino alcançado');
+        }
+
+    }, 120);
+}
+
+// ============================================================
+// UTILITÁRIOS
+// ============================================================
+
 function limparCaminhoAntigo() {
-    for (let i = 0; i < LINHAS; i++) {
-        for (let j = 0; j < COLUNAS; j++) {
+    // CORRIGIDO: usa mapa.length e mapa[i].length
+    for (let i = 0; i < mapa.length; i++) {
+        for (let j = 0; j < mapa[i].length; j++) {
             mapa[i][j].isCaminho = false;
         }
     }
@@ -395,28 +480,35 @@ function atualizarStatus(msg) {
     if (el) el.textContent = msg;
 }
 
-// funções de persistência (salvar e carregar cidades)
+// ============================================================
+// SALVAR E CARREGAR CIDADES
+// o mapa é percorrido manualmente para gerar o JSON
+// ao carregar, cada string reconstrói o objeto correto
+// ============================================================
+
 function salvarCidade() {
     let nome = prompt("Nome da cidade:");
     if (!nome) return;
 
+    // percorre o array manualmente com mapa.length e mapa[i].length
     let celulas = [];
-    for (let i = 0; i < LINHAS; i++) {
+    for (let i = 0; i < mapa.length; i++) {
         celulas[i] = [];
-        for (let j = 0; j < COLUNAS; j++) {
+        for (let j = 0; j < mapa[i].length; j++) {
             let celula = mapa[i][j];
-            let tipo = celula.obterClasseCSS();
+            let tipo   = celula.obterClasseCSS();
             if (tipo === 'rua' && celula.temTransito) tipo = 'engarrafamento';
             celulas[i][j] = tipo;
         }
     }
 
+    // converte para JSON e força download do arquivo no navegador
     let cidade = { nome, linhas: LINHAS, colunas: COLUNAS, celulas };
-    let json = JSON.stringify(cidade);
-    let blob = new Blob([json], { type: 'application/json' });
-    let url = URL.createObjectURL(blob);
-    let a = document.createElement('a');
-    a.href = url;
+    let json   = JSON.stringify(cidade);
+    let blob   = new Blob([json], { type: 'application/json' });
+    let url    = URL.createObjectURL(blob);
+    let a      = document.createElement('a');
+    a.href     = url;
     a.download = nome + '.json';
     a.click();
     URL.revokeObjectURL(url);
@@ -424,24 +516,26 @@ function salvarCidade() {
 }
 
 function carregarCidade() {
-    let input = document.createElement('input');
-    input.type = 'file';
+    let input    = document.createElement('input');
+    input.type   = 'file';
     input.accept = '.json';
 
     input.addEventListener('change', function () {
         let arquivo = input.files[0];
         if (!arquivo) return;
 
-        let leitor = new FileReader();
+        let leitor    = new FileReader();
         leitor.onload = function (e) {
             let cidade = JSON.parse(e.target.result);
 
+            // reconstrói o array manualmente a partir do JSON
+            // cada tipo salvo como string vira o objeto correto
             mapa = [];
             for (let i = 0; i < cidade.linhas; i++) {
                 mapa[i] = [];
                 for (let j = 0; j < cidade.colunas; j++) {
                     let tipo = cidade.celulas[i][j];
-                    
+
                     if (tipo === 'predio') {
                         mapa[i][j] = new Predio(j, i);
                     } else if (tipo === 'casa') {
@@ -469,7 +563,10 @@ function carregarCidade() {
     input.click();
 }
 
-// inicialização dos eventos
+// ============================================================
+// INICIALIZAÇÃO — EVENTOS DOS BOTÕES
+// ============================================================
+
 document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-pontoa').addEventListener('click', () => {
@@ -489,6 +586,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-rota').addEventListener('click', tracarRota);
 
     document.getElementById('btn-gerar').addEventListener('click', () => {
+        if (intervaloAnim !== null) {
+            clearInterval(intervaloAnim);
+            intervaloAnim = null;
+        }
         pontoA = null;
         pontoB = null;
         inicializarMapa();
@@ -496,10 +597,10 @@ document.addEventListener('DOMContentLoaded', () => {
         atualizarStatus('mapa resetado');
     });
 
-    const btnSalvar = document.getElementById('btn-salvar');
+    const btnSalvar   = document.getElementById('btn-salvar');
     const btnCarregar = document.getElementById('btn-carregar');
-    
-    if (btnSalvar) btnSalvar.addEventListener('click', salvarCidade);
+
+    if (btnSalvar)   btnSalvar.addEventListener('click', salvarCidade);
     if (btnCarregar) btnCarregar.addEventListener('click', carregarCidade);
 
     inicializarMapa();
