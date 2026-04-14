@@ -333,6 +333,13 @@ main::before {
   text-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
+.carro-atual::after {
+    content: '◉';
+    color: #000000;
+    font-size: 16px;
+    text-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
 /* STATUS BAR */
 
 .statusbar {
@@ -421,22 +428,19 @@ main::before {
   to   { opacity: 1; transform: scale(1); }
 }
 
-/* TOOLTIP */
+/* tooltip personalizado */
 #tooltip-personalizado {
-    position: fixed;
-    background: var(--surface);
-    color: var(--text);
-    padding: 8px 12px;
-    border: 1px solid var(--border2);
-    border-radius: 0;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    z-index: 999;
-    display: none;
-    pointer-events: none;
-    backdrop-filter: blur(4px);
+  display: none;
+  position: fixed;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  pointer-events: none;
+  z-index: 9999;
 }
